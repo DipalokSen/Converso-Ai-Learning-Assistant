@@ -50,3 +50,64 @@ export const getCompanion=async (id:string)=>{
 
     return data[0];
 }
+
+export const addToSessionHistory=async(companionId:string)=>{
+
+   const {userId}=await auth();
+   const supabase = createSupabaseClient();
+    const {data, error}=await supabase
+     .from('Session_history')
+     .insert({
+        companion_id:companionId,
+        user_id: userId})
+     
+if (error) throw new Error(error.message);
+
+
+   return data;
+}
+
+export const getRecentSession=async (limit = 10) => {
+
+const supabase = createSupabaseClient();
+const { data, error } = await supabase
+.from('Session_history')
+.select(`Companion:companion_id(*)`)
+.order('created_at', { ascending: false })
+.limit(limit);
+
+
+if (error) throw new Error(error.message);
+return data.map(({Companion}) => Companion);
+} 
+
+
+export const getUserSession=async (userid:string ,limit=10) => {
+
+const supabase = createSupabaseClient();
+const { data, error } = await supabase
+.from('Session_history')
+.select(`Companion:companion_id(*)`)
+.eq('user_id', userid)
+.order('created_at', { ascending: false })
+.limit(limit);
+
+
+if (error) throw new Error(error.message);
+return data.map(({Companion}) => Companion);
+} 
+
+
+export const getUserCompanion=async (userid:string) => {
+
+const supabase = createSupabaseClient();
+const { data, error } = await supabase
+.from('Companion')
+.select()
+.eq('Author', userid)
+
+
+
+if (error) throw new Error(error.message);
+return data
+} 
